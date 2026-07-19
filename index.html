@@ -3,54 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPM FLAME WEB TOOL</title>
+    <title>CPM1 FLAME TOOL</title>
     <style>
-        body { background-color: #000; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .container { border: 2px solid #00aaff; padding: 20px; border-radius: 10px; width: 300px; text-align: center; }
-        h2 { color: #00aaff; font-size: 18px; margin-bottom: 15px; }
-        input, select { width: 100%; padding: 10px; margin: 8px 0; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #00aaff; border: none; color: #000; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        .mod-btn { background: #222; border: 1px solid #00aaff; color: #00aaff; }
+        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
+        .container { border: 2px solid #00aaff; padding: 20px; border-radius: 10px; max-width: 350px; margin: auto; }
+        input { width: 90%; padding: 12px; margin: 10px 0; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 5px; }
+        button { width: 95%; padding: 12px; background: #00aaff; border: none; color: #000; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
         #dashboard { display: none; }
-        .status { font-size: 12px; margin-top: 10px; color: #ff8800; min-height: 20px; }
+        .status { margin-top: 15px; color: #ff8800; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <div class="container" id="loginBox">
-    <h2>CPM FLAME WEB TOOL</h2>
-    <select id="gameSelect">
-        <option value="1">CPM 1</option>
-        <option value="2">CPM 2</option>
-    </select>
+    <h2>CPM1 FLAME TOOL</h2>
     <input type="email" id="email" placeholder="Game Email">
     <input type="password" id="pass" placeholder="Game Password">
-    <input type="text" id="key" placeholder="Access Key">
     <button onclick="login()">LOGIN TO SERVER</button>
 </div>
 
 <div class="container" id="dashboard">
-    <h2>CPM DASHBOARD</h2>
-    <button class="mod-btn" onclick="applyMod('money')">💰 ADD CASH & COINS</button>
-    <button class="mod-btn" onclick="applyMod('unlockAll')">🏎️ UNLOCK ALL ITEMS</button>
-    <button class="mod-btn" onclick="applyMod('everything')">👑 EVERYTHING UNLOCKED</button>
+    <h2>CPM1 DASHBOARD</h2>
+    <button onclick="applyMod('money')">💰 ADD 1M CASH & COINS</button>
+    <button onclick="applyMod('items')">🏎️ UNLOCK ITEMS (HORN/SMOKE/ENGINE)</button>
     <p id="status" class="status"></p>
     <button onclick="location.reload()" style="background: #ff3333; color: #fff;">LOGOUT</button>
 </div>
 
 <script>
-    const FIREBASE_KEYS = { 1: 'AIzaSyBW1ZbMiUeDZHYUO2bY8Bfnf5rRgrQGPTM', 2: 'AIzaSyCQDz9rgjgmvmFkvVfmvr2-7fT4tfrzRRQ' };
-    const KING_FUNCTIONS = { 1: 'https://us-central1-cp-multiplayer.cloudfunctions.net/SetUserRating4', 2: 'https://europe-west1-cpm-2-7cea1.cloudfunctions.net/SetUserRating22_1' };
+    // CPM1 Firebase Key
+    const API_KEY = 'AIzaSyBW1ZbMiUeDZHYUO2bY8Bfnf5rRgrQGPTM';
+    // CPM1 Cloud Function URL
+    const FUNCTION_URL = 'https://us-central1-cp-multiplayer.cloudfunctions.net/SetUserRating4';
 
     let userToken = "";
 
     async function login() {
-        const game = document.getElementById('gameSelect').value;
         const email = document.getElementById('email').value;
         const pass = document.getElementById('pass').value;
         
         try {
-            const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${FIREBASE_KEYS[game]}`, {
+            const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`, {
                 method: 'POST', body: JSON.stringify({ email, password: pass, returnSecureToken: true }), headers: {'Content-Type': 'application/json'}
             });
             const data = await res.json();
@@ -59,33 +52,31 @@
                 document.getElementById('loginBox').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
             } else {
-                alert("Login Failed: " + (data.error ? data.error.message : "Unknown error"));
+                alert("Login Failed: " + (data.error ? data.error.message : "Invalid Credentials"));
             }
         } catch(e) { alert("Error connecting to server"); }
     }
 
     async function applyMod(type) {
-        const game = document.getElementById('gameSelect').value;
         const status = document.getElementById('status');
-        status.innerText = "Applying " + type + "...";
+        status.innerText = "Processing...";
 
-        // ഓരോ മോഡിനും അനുസരിച്ചുള്ള പെയ്‌ലോഡ്
-        let payload = { data: { RatingData: { cars: 100000, money: 9999999, coins: 99999 } } };
-        
-        if (type === 'unlockAll') {
+        let payload = {};
+        if (type === 'money') {
+            payload = { data: { RatingData: { money: 1000000, coins: 1000000 } } };
+        } else {
             payload = { data: { RatingData: { horns: true, smoke: true, engine: 1600, houses: true } } };
-        } else if (type === 'everything') {
-            payload = { data: { RatingData: { cars: 100000, money: 9999999, coins: 99999, horns: true, smoke: true, engine: 1600, houses: true } } };
         }
 
         try {
-            const res = await fetch(KING_FUNCTIONS[game], {
+            const res = await fetch(FUNCTION_URL, {
                 method: 'POST',
                 headers: { 'Authorization': 'Bearer ' + userToken, 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            status.innerText = "Success! Data Updated.";
-        } catch(e) { status.innerText = "Error applying mods."; }
+            const result = await res.json();
+            status.innerText = "Success! Reload game to see changes.";
+        } catch(e) { status.innerText = "Error: Server might be blocking requests."; }
     }
 </script>
 </body>
