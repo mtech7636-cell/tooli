@@ -24,16 +24,15 @@
 
 <div class="container" id="dashboard">
     <h2>CPM1 DASHBOARD</h2>
-    <button onclick="applyMod('money')">💰 ADD 1M CASH & COINS</button>
-    <button onclick="applyMod('items')">🏎️ UNLOCK ITEMS (HORN/SMOKE/ENGINE)</button>
+    <button onclick="applyMod('king')">👑 SET KING RANK</button>
+    <button onclick="applyMod('money')">💰 ADD CASH & COINS</button>
+    <button onclick="applyMod('items')">🏎️ UNLOCK ALL ITEMS</button>
     <p id="status" class="status"></p>
     <button onclick="location.reload()" style="background: #ff3333; color: #fff;">LOGOUT</button>
 </div>
 
 <script>
-    // CPM1 Firebase Key
     const API_KEY = 'AIzaSyBW1ZbMiUeDZHYUO2bY8Bfnf5rRgrQGPTM';
-    // CPM1 Cloud Function URL
     const FUNCTION_URL = 'https://us-central1-cp-multiplayer.cloudfunctions.net/SetUserRating4';
 
     let userToken = "";
@@ -62,9 +61,11 @@
         status.innerText = "Processing...";
 
         let payload = {};
-        if (type === 'money') {
-            payload = { data: { RatingData: { money: 1000000, coins: 1000000 } } };
-        } else {
+        if (type === 'king') {
+            payload = { data: { RatingData: { cars: 100000, money: 9999999, coins: 999999, race_win: 5000, time: 99999999 } } };
+        } else if (type === 'money') {
+            payload = { data: { RatingData: { money: 9999999, coins: 999999 } } };
+        } else if (type === 'items') {
             payload = { data: { RatingData: { horns: true, smoke: true, engine: 1600, houses: true } } };
         }
 
@@ -74,9 +75,8 @@
                 headers: { 'Authorization': 'Bearer ' + userToken, 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            const result = await res.json();
-            status.innerText = "Success! Reload game to see changes.";
-        } catch(e) { status.innerText = "Error: Server might be blocking requests."; }
+            status.innerText = "Success! Data Updated.";
+        } catch(e) { status.innerText = "Error: Server failed."; }
     }
 </script>
 </body>
