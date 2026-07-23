@@ -154,6 +154,8 @@
 
     <script>
         let authToken = "";
+        // Yangი API Key bu yerga qo'shildi
+        const API_KEY = "AIzaSyCQDz9rgjgmvmFkvVfmvr2-7fT4tfrzRRQ";
 
         function handleLogin() {
             const email = document.getElementById("email").value;
@@ -164,9 +166,7 @@
                 return;
             }
 
-            // Firebase Login API so'rovi
-            const API_KEY = "AIzaSyCQDz9rgjgmvmFkvVfmvr2-7fT4tfrzRRQ";
-            const url = `https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=${API_KEY}`;
+            const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`;
             
             fetch(url, {
                 method: 'POST',
@@ -184,12 +184,12 @@
                     alert("Xatolik: " + (data.error?.message || "Login amalga oshmadi"));
                 }
             })
-            .catch(err => alert("Tarmoqda xatolಗ್: " + err));
+            .catch(err => alert("Tarmoqda xatolik: " + err));
         }
 
         function runService(type) {
             const statusDiv = document.getElementById("status");
-            statusDiv.innerText = "Bajarilမ်ုto'rda...";
+            statusDiv.innerText = "Bajarilmoqda...";
 
             let url = 'https://us-central1-cp-multiplayer.cloudfunctions.net/SavePlayerRecordsPartially5';
             let headers = { "authorization": `Bearer ${authToken}`, "content-type": "application/json" };
@@ -209,7 +209,7 @@
                 if(!newId) return;
                 bodyData = { "data": JSON.stringify({ "LocalID": newId }) };
             } else if(type === 'delete') {
-                url = `https://identitytoolkit.googleapis.com/v1/accounts:delete?key=AIzaSyAe_aOVT1gSfmHKBrorFvX4fRwN5nODXVA`;
+                url = `https://identitytoolkit.googleapis.com/v1/accounts:delete?key=${API_KEY}`;
                 fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
