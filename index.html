@@ -1,83 +1,248 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPM1 FLAME TOOL</title>
+    <title>CPM Tool Web Panel</title>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; padding: 20px; }
-        .container { border: 2px solid #00aaff; padding: 20px; border-radius: 10px; max-width: 350px; margin: auto; }
-        input { width: 90%; padding: 12px; margin: 10px 0; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 5px; }
-        button { width: 95%; padding: 12px; background: #00aaff; border: none; color: #000; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        #dashboard { display: none; }
-        .status { margin-top: 15px; color: #ff8800; font-size: 14px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        body {
+            background-color: #0b0b0b;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: #121212;
+            border: 2px solid #525252;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.1);
+        }
+        .ascii-art {
+            font-size: 10px;
+            line-height: 1.1;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 20px;
+            white-space: pre;
+            overflow-x: auto;
+        }
+        .box-border {
+            border: 1px solid #787672;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            background: #1a1a1a;
+        }
+        h2 {
+            text-align: center;
+            color: #c2c1be;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .input-group {
+            margin-bottom: 12px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            color: #9e9e9e;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            background: #000;
+            border: 1px solid #525252;
+            color: #fff;
+            border-radius: 4px;
+            outline: none;
+        }
+        input:focus {
+            border-color: #00ff00;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #222;
+            border: 1px solid #787672;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 10px;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #333;
+            border-color: #00ff00;
+            color: #00ff00;
+        }
+        .grid-menu {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+        .status-msg {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #00ff00;
+        }
     </style>
 </head>
 <body>
 
-<div class="container" id="loginBox">
-    <h2>CPM1 FLAME TOOL</h2>
-    <input type="email" id="email" placeholder="Game Email">
-    <input type="password" id="pass" placeholder="Game Password">
-    <button onclick="login()">LOGIN TO SERVER</button>
-</div>
+    <div class="container">
+        <!-- ASCII Art Header -->
+        <div class="ascii-art">
+ ██████╗██████╗ ███╗   ███╗ ████████╗ ██████╗  ██████╗ ██╗
+██╔════╝██╔══██╗████╗ ████║ ╚══██╔══╝██╔═══██╗██╔═══██╗██║
+██║     ██████╔╝██╔████╔██║    ██║   ██║   ██║██║   ██║██║
+██║     ██╔═══╝ ██║╚██╔╝██║    ██║   ██║   ██║██║   ██║██║
+╚██████╗██║     ██║ ╚═╝ ██║    ██║   ╚██████╔╝╚██████╔╝███████╗
+ ╚═════╝╚═╝     ╚═╝     ╚═╝    ╚═╝    ╚═════╝  ╚═════╝ ╚══════╝
+        </div>
 
-<div class="container" id="dashboard">
-    <h2>CPM1 DASHBOARD</h2>
-    <button onclick="applyMod('king')">👑 SET KING RANK</button>
-    <button onclick="applyMod('money')">💰 ADD CASH & COINS</button>
-    <button onclick="applyMod('items')">🏎️ UNLOCK ALL ITEMS</button>
-    <p id="status" class="status"></p>
-    <button onclick="location.reload()" style="background: #ff3333; color: #fff;">LOGOUT</button>
-</div>
+        <!-- LOGIN SECTION -->
+        <div id="login-section" class="box-border">
+            <h2>CPM AKKAUNTGA KIRISH</h2>
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" id="email" placeholder="email@gmail.com">
+            </div>
+            <div class="input-group">
+                <label>Parol</label>
+                <input type="password" id="password" placeholder="********">
+            </div>
+            <button onclick="handleLogin()">KIRISH</button>
+        </div>
 
-<script>
-    const API_KEY = 'AIzaSyBW1ZbMiUeDZHYUO2bY8Bfnf5rRgrQGPTM';
-    const FUNCTION_URL = 'https://us-central1-cp-multiplayer.cloudfunctions.net/SetUserRating4';
+        <!-- DASHBOARD SECTION (Hidden by default) -->
+        <div id="dashboard-section" class="hidden">
+            <div class="box-border">
+                <h2>CPM SERVICES</h2>
+                <p id="user-info" style="font-size: 12px; color: #aaa; margin-bottom: 10px;"></p>
+                <div class="grid-menu">
+                    <button onclick="runService('money')">[1] PUL SOLISH</button>
+                    <button onclick="runService('coin')">[2] COIN SOLISH</button>
+                    <button onclick="runService('king')">[3] KING RANK</button>
+                    <button onclick="runService('id')">[4] ID O'ZGARTIRISH</button>
+                    <button onclick="runService('unlock')">[5] NARSANI OCHISH</button>
+                    <button onclick="runService('delete')">[7] O'CHIRISH</button>
+                </div>
+                <div id="status" class="status-msg"></div>
+            </div>
+            <button onclick="handleLogout()" style="background: #500; border-color: #800;">CHIQISH</button>
+        </div>
+    </div>
 
-    let userToken = "";
+    <script>
+        let authToken = "";
 
-    async function login() {
-        const email = document.getElementById('email').value;
-        const pass = document.getElementById('pass').value;
-        
-        try {
-            const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`, {
-                method: 'POST', body: JSON.stringify({ email, password: pass, returnSecureToken: true }), headers: {'Content-Type': 'application/json'}
-            });
-            const data = await res.json();
-            if (data.idToken) {
-                userToken = data.idToken;
-                document.getElementById('loginBox').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-            } else {
-                alert("Login Failed: " + (data.error ? data.error.message : "Invalid Credentials"));
+        function handleLogin() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            if(!email || !password) {
+                alert("Email va parolni kiriting!");
+                return;
             }
-        } catch(e) { alert("Error connecting to server"); }
-    }
 
-    async function applyMod(type) {
-        const status = document.getElementById('status');
-        status.innerText = "Processing...";
-
-        let payload = {};
-        if (type === 'king') {
-            payload = { data: { RatingData: { cars: 100000, money: 9999999, coins: 999999, race_win: 5000, time: 99999999 } } };
-        } else if (type === 'money') {
-            payload = { data: { RatingData: { money: 9999999, coins: 999999 } } };
-        } else if (type === 'items') {
-            payload = { data: { RatingData: { horns: true, smoke: true, engine: 1600, houses: true } } };
+            // Firebase Login API so'rovi
+            const API_KEY = "AIzaSyAe_aOVT1gSfmHKBrorFvX4fRwN5nODXVA";
+            const url = `https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=${API_KEY}`;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, password: password, returnSecureToken: true })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.idToken) {
+                    authToken = data.idToken;
+                    document.getElementById("login-section").classList.add("hidden");
+                    document.getElementById("dashboard-section").classList.remove("hidden");
+                    document.getElementById("user-info").innerText = `Email: ${email}`;
+                } else {
+                    alert("Xatolik: " + (data.error?.message || "Login amalga oshmadi"));
+                }
+            })
+            .catch(err => alert("Tarmoqda xatolಗ್: " + err));
         }
 
-        try {
-            const res = await fetch(FUNCTION_URL, {
+        function runService(type) {
+            const statusDiv = document.getElementById("status");
+            statusDiv.innerText = "Bajarilမ်ုto'rda...";
+
+            let url = 'https://us-central1-cp-multiplayer.cloudfunctions.net/SavePlayerRecordsPartially5';
+            let headers = { "authorization": `Bearer ${authToken}`, "content-type": "application/json" };
+            let bodyData = {};
+
+            if(type === 'money') {
+                bodyData = { "data": JSON.stringify({ "money": 50000000 }) };
+            } else if(type === 'coin') {
+                let coinVal = prompt("Coin miqdorini kiriting:", "30000");
+                if(!coinVal) return;
+                bodyData = { "data": JSON.stringify({ "coin": coinVal }) };
+            } else if(type === 'king') {
+                url = "https://us-central1-cp-multiplayer.cloudfunctions.net/SetUserRating4";
+                bodyData = { "data": "{\"RatingData\" : {\"t_distance\" : 2000000000,\"time\" : 2000000000,\"speed_banner\" : 2000000000,\"gifts\" : 2000000000,\"treasure\" : 2000000000,\"cars\" : 2000000000,\"race_win\" : 999,\"levels\" : 2000000000,\"drift\" : 2000000000,\"run\" : 2000000000,\"police\" : 2000000000,\"block_post\" : 2000000000,\"real_estate\" : 2000000000,\"fuel\" : 2000000000,\"car_trade\" : 2000000000,\"car_exchange\" : 2000000000,\"burnt_tire\" : 2000000000,\"car_fix\" : 2000000000,\"car_wash\" : 2000000000,\"offroad\" : 2000000000,\"passanger_distance\" : 2000000000,\"reactions\" : 2000000000,\"drift_max\" : 2000000000,\"taxi\" : 2000000000,\"delivery\" : 2000000000,\"cargo\" : 2000000000,\"push_ups\" : 2000000000,\"slicer_cut\" : 2000000000,\"car_collided\" : 2000000000,\"new_type\" : 2000000000}}" };
+            } else if(type === 'id') {
+                let newId = prompt("Yangi ID ni kiriting:");
+                if(!newId) return;
+                bodyData = { "data": JSON.stringify({ "LocalID": newId }) };
+            } else if(type === 'delete') {
+                url = `https://identitytoolkit.googleapis.com/v1/accounts:delete?key=AIzaSyAe_aOVT1gSfmHKBrorFvX4fRwN5nODXVA`;
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idToken: authToken })
+                }).then(res => {
+                    if(res.ok) { alert("Akkaunt o'chirildi!"); handleLogout(); }
+                    else { alert("Xatolik yuz berdi!"); }
+                });
+                return;
+            }
+
+            fetch(url, {
                 method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + userToken, 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                headers: headers,
+                body: JSON.stringify(bodyData)
+            })
+            .then(res => {
+                if(res.status === 200) {
+                    statusDiv.innerText = "Success ☆ Muvaffaqiyatli bajarildi!";
+                } else {
+                    statusDiv.innerText = "❌ Xatolik yuz berdi!";
+                }
+            })
+            .catch(err => {
+                statusDiv.innerText = "⚠️ Tarmoq xatoligi!";
             });
-            status.innerText = "Success! Data Updated.";
-        } catch(e) { status.innerText = "Error: Server failed."; }
-    }
-</script>
+        }
+
+        function handleLogout() {
+            authToken = "";
+            document.getElementById("dashboard-section").classList.add("hidden");
+            document.getElementById("login-section").classList.remove("hidden");
+        }
+    </script>
 </body>
 </html>
